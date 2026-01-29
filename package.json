@@ -1,0 +1,55 @@
+{
+  "name": "playwright_automation_framework",
+  "version": "1.0.0",
+  "description": "AI-Augmented Test Generation and Maintenance Framework Using Playwright",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "test": "playwright test",
+    "test:headed": "playwright test --headed",
+    "test:debug": "playwright test --debug",
+    "quickstart": "ts-node examples/quickstart.ts",
+    "demo": "playwright test examples/demo.ts",
+    "simple-demo": "node examples/simple-demo.js",
+    "generate:tests": "ts-node src/scripts/generateTests.ts",
+    "collect:metrics": "ts-node src/scripts/collectMetrics.ts",
+    "report": "playwright show-report",
+    "clean": "rm -rf dist reports screenshots/diff",
+    "setup": "npm install && npx playwright install"
+  },
+  "keywords": [
+    "playwright",
+    "ai",
+    "testing",
+    "automation",
+    "self-healing",
+    "test-generation",
+    "llm"
+  ],
+  "author": "Bhagya",
+  "license": "MIT",
+  "dependencies": {
+    "@playwright/test": "^1.40.1",
+    "playwright": "^1.40.1",
+    "openai": "^4.20.1",
+    "axios": "^1.6.2",
+    "cheerio": "^1.0.0-rc.12",
+    "dotenv": "^16.3.1",
+    "pngjs": "^7.0.0",
+    "pixelmatch": "^5.3.0",
+    "lodash": "^4.17.21"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.4",
+    "@types/cheerio": "^0.22.35",
+    "@types/pngjs": "^6.0.4",
+    "@types/pixelmatch": "^5.2.6",
+    "@types/lodash": "^4.14.202",
+    "typescript": "^5.3.3",
+    "ts-node": "^10.9.2"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  }
+}
