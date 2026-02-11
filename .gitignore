@@ -1,0 +1,56 @@
+# Dependencies
+node_modules/
+package-lock.json
+
+# Environment variables
+.env
+.env.local
+
+# Build output
+dist/
+build/
+*.tsbuildinfo
+
+# Test results
+test-results/
+playwright-report/
+reports/*.html
+reports/*.json
+reports/*.xml
+
+# Screenshots
+screenshots/diff/*
+!screenshots/diff/.gitkeep
+screenshots/failures/
+
+# Logs
+*.log
+npm-debug.log*
+logs/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Playwright
+playwright/.cache/
+
+# Coverage
+coverage/
+.nyc_output/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Data files
+data/selectors/healing-log.json
+data/metrics/*.json

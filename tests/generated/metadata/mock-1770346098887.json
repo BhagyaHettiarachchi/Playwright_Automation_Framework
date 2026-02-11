@@ -1,0 +1,41 @@
+{
+  "id": "mock-1770346098887",
+  "title": "Add a new todo",
+  "description": "Mock test generated from: \n    As a user\n    I want to visit the TodoMVC application\n    And add a new todo item\n    So that I...",
+  "userStory": "\n    As a user\n    I want to visit the TodoMVC application\n    And add a new todo item\n    So that I can track my tasks\n    \n    Scenario: Add a new todo\n    Given I am on the TodoMVC page\n    When I enter \"Buy groceries\" in the todo input\n    And I press Enter\n    Then I should see \"Buy groceries\" in the todo list\n  ",
+  "steps": [
+    {
+      "action": "navigate",
+      "selector": "https://demo.playwright.dev/todomvc",
+      "description": "Navigate to https://demo.playwright.dev/todomvc"
+    },
+    {
+      "action": "fill",
+      "selector": ".new-todo, input[placeholder*=\"todo\"]",
+      "value": "Buy groceries",
+      "description": "Enter new todo item"
+    },
+    {
+      "action": "press",
+      "selector": ".new-todo",
+      "value": "Enter",
+      "description": "Press Enter to add todo"
+    }
+  ],
+  "expectedResults": [
+    "Test should execute successfully",
+    "All steps should complete without errors"
+  ],
+  "priority": 5,
+  "generatedBy": "AI",
+  "createdAt": "2026-02-06T02:48:18.887Z",
+  "lastModified": "2026-02-06T02:48:18.887Z",
+  "tags": [
+    "mock",
+    "generated"
+  ],
+  "metadata": {
+    "mockMode": true,
+    "note": "This is a simulated test. Replace with real LLM generation when API is available."
+  }
+}
