@@ -1,0 +1,11 @@
+As a user
+I want to add a new todo item
+So that I can track my tasks
+
+Scenario: Add a single todo item
+Given I am on the TodoMVC page at https://demo.playwright.dev/todomvc
+When I click on the todo input field
+And I type "Buy groceries"
+And I press Enter
+Then I should see "Buy groceries" in the todo list
+And the todo count should show "1 item left"

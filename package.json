@@ -12,6 +12,7 @@
     "demo": "playwright test examples/demo.ts",
     "simple-demo": "node examples/simple-demo.js",
     "generate:tests": "ts-node src/scripts/generateTests.ts",
+    "generate:and:run": "ts-node src/scripts/generateTests.ts && playwright test",
     "collect:metrics": "ts-node src/scripts/collectMetrics.ts",
     "report": "playwright show-report",
     "clean": "rm -rf dist reports screenshots/diff",

@@ -11,7 +11,7 @@ export default defineConfig({
   workers: process.env.CI ? 1 : undefined,
   
   reporter: [
-    ['html', { outputFolder: 'reports/html' }],
+    ['html', { outputFolder: 'reports/html', open: 'always' }],
     ['json', { outputFile: 'reports/results.json' }],
     ['junit', { outputFile: 'reports/junit.xml' }],
     ['list'],
@@ -19,9 +19,9 @@ export default defineConfig({
 
   use: {
     baseURL: process.env.BASE_URL || 'http://localhost:3000',
-    trace: 'on-first-retry',
-    screenshot: 'only-on-failure',
-    video: 'retain-on-failure',
+    trace: 'on',
+    screenshot: 'on',
+    video: 'on',
     headless: process.env.HEADLESS !== 'false',
     actionTimeout: parseInt(process.env.TIMEOUT || '30000'),
   },
@@ -31,13 +31,13 @@ export default defineConfig({
       name: 'chromium',
       use: { ...devices['Desktop Chrome'] },
     },
-    {
+    /*{
       name: 'firefox',
       use: { ...devices['Desktop Firefox'] },
     },
     {
       name: 'webkit',
       use: { ...devices['Desktop Safari'] },
-    },
+    },*/
   ],
 });

@@ -95,7 +95,7 @@ export class AITestRunner {
     return result;
   }
 
-  private async executeStepWithHealing(
+  /*private async executeStepWithHealing(
     page: Page,
     step: any,
     result: TestResult
@@ -145,6 +145,71 @@ export class AITestRunner {
       
       case 'wait':
         await page.waitForTimeout(parseInt(value || '1000'));
+        break;
+      
+      default:
+        throw new Error(`Unknown action: ${action}`);
+    }
+
+    await page.waitForTimeout(500);
+  }*/
+
+  private async executeStepWithHealing(
+    page: Page,
+    step: any,
+    result: TestResult
+  ): Promise<void> {
+    const { action, selector, value, description } = step;
+
+    // ✅ FIX: Handle navigate and wait FIRST before finding any element
+    // These actions don't need a locator/selector
+    if (action.toLowerCase() === 'navigate') {
+      await page.goto(value || selector);
+      await page.waitForLoadState('networkidle');
+      return;
+    }
+
+    if (action.toLowerCase() === 'wait') {
+      await page.waitForTimeout(parseInt(value || '1000'));
+      return;
+    }
+
+    // Only call findElementWithHealing for actions that need an element
+    const { locator, healed, newSelector } = await this.selfHealing.findElementWithHealing(
+      page,
+      selector,
+      description
+    );
+
+    if (healed) {
+      result.selfHealingApplied = true;
+      result.healingDetails = {
+        originalSelector: selector,
+        newSelector: newSelector || selector,
+        reason: `Element located using self-healing mechanism`,
+      };
+      console.log(`   🔧 Self-healing applied for selector: ${selector}`);
+    }
+
+    switch (action.toLowerCase()) {
+      case 'click':
+        await locator.click();
+        break;
+      
+      case 'fill':
+        await locator.fill(value || '');
+        break;
+      
+      case 'select':
+        await locator.selectOption(value || '');
+        break;
+      
+      case 'check':
+        await locator.check();
+        break;
+      
+      case 'press':
+        await locator.press(value || 'Enter');
         break;
       
       default:

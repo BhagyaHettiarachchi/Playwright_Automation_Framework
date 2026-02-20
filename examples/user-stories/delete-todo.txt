@@ -1,0 +1,12 @@
+As a user
+I want to delete a todo item
+So that I can remove tasks I no longer need
+
+Scenario: Delete a single todo item
+Given I am on the TodoMVC page at https://demo.playwright.dev/todomvc
+And I have added "Buy groceries" to the list
+When I hover over "Buy groceries"
+And I click the X (delete) button that appears
+Then "Buy groceries" should be removed from the list
+And the list should be empty
+And the footer should not be visible

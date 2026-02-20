@@ -1,4 +1,4 @@
-import OpenAI from 'openai';
+/*import OpenAI from 'openai';
 import { config } from '../config/config';
 import { TestCase, TestStep } from '../models/TestCase';
 
@@ -290,6 +290,328 @@ test.describe('${testCase.title}', () => {
       });
       return completion.choices[0].message.content?.trim() || currentSelector;
     } catch (error: any) {
+      return currentSelector;
+    }
+  }
+}*/
+
+import OpenAI from 'openai';
+import { config } from '../config/config';
+import { TestCase, TestStep } from '../models/TestCase';
+
+export class LLMService {
+  private openai: OpenAI;
+
+  constructor() {
+    // ✅ Validate API key on initialization
+    if (!config.openaiApiKey || config.openaiApiKey === '') {
+      console.error('\n❌ ERROR: OPENAI_API_KEY not found in .env file');
+      console.error('   Please add your OpenAI API key to .env:');
+      console.error('   OPENAI_API_KEY=sk-proj-your-key-here\n');
+      throw new Error('Missing OPENAI_API_KEY');
+    }
+
+    this.openai = new OpenAI({
+      apiKey: config.openaiApiKey,
+    });
+
+    console.log('✅ OpenAI API initialized with key: ' + config.openaiApiKey.substring(0, 20) + '...');
+  }
+
+  async generateTestFromUserStory(userStory: string, appUrl: string): Promise<TestCase> {
+    const prompt = `
+You are an expert QA automation engineer. Generate a Playwright test case from the following user story.
+
+User Story:
+${userStory}
+
+Application URL: ${appUrl}
+
+Generate a test case in the following JSON format:
+{
+  "title": "Test title",
+  "description": "Test description",
+  "steps": [
+    {
+      "action": "navigate|click|fill|select|check|press|wait",
+      "selector": "CSS selector or role-based selector",
+      "value": "optional value for fill/select actions",
+      "description": "What this step does"
+    }
+  ],
+  "expectedResults": ["list of expected outcomes"],
+  "tags": ["relevant tags"]
+}
+
+Use Playwright best practices:
+- Prefer role-based selectors (e.g., getByRole, getByLabel)
+- Use data-testid when appropriate
+- Include proper waits and assertions
+- Make tests resilient and maintainable
+
+Return ONLY valid JSON, no markdown or explanations.
+`;
+
+    try {
+      const completion = await this.openai.chat.completions.create({
+        model: config.openaiModel,
+        messages: [
+          {
+            role: 'system',
+            content: 'You are a QA automation expert specializing in Playwright test generation.',
+          },
+          {
+            role: 'user',
+            content: prompt,
+          },
+        ],
+        temperature: 0.3,
+        max_tokens: 2000,
+      });
+
+      const responseContent = completion.choices[0].message.content || '{}';
+      
+      // Clean any markdown formatting
+      const cleanedContent = responseContent
+        .replace(/```json\n?/g, '')
+        .replace(/```\n?/g, '')
+        .trim();
+
+      const generatedTest = JSON.parse(cleanedContent);
+
+      return {
+        id: `ai-${Date.now()}`,
+        title: generatedTest.title,
+        description: generatedTest.description,
+        userStory,
+        steps: generatedTest.steps,
+        expectedResults: generatedTest.expectedResults,
+        priority: 5,
+        generatedBy: 'AI',
+        createdAt: new Date(),
+        lastModified: new Date(),
+        tags: generatedTest.tags || [],
+      };
+    } catch (error) {
+      console.error('Error generating test from user story:', error);
+      throw error;
+    }
+  }
+
+  /*async convertTestToPlaywrightCode(testCase: TestCase): Promise<string> {
+    const prompt = `
+Convert the following test case into executable Playwright TypeScript code.
+
+Test Case:
+${JSON.stringify(testCase, null, 2)}
+
+Generate complete Playwright test code with:
+- Proper imports from '@playwright/test'
+- Test describe block
+- Before/after hooks if needed
+- Assertions for expected results
+- Error handling
+- Comments explaining key steps
+- Use async/await properly
+- Include proper waits
+
+CRITICAL IMPORT RULES:
+1. Use: import { test, expect } from '@playwright/test';
+2. Use: import { SelfHealingManager } from '../../src/core/selfHealing';  // ← NAMED EXPORT with curly braces
+3. Do NOT use default imports (import X from '...')
+
+Example correct imports:
+import { test, expect } from '@playwright/test';
+import { SelfHealingManager } from '../../src/core/selfHealing';
+
+const selfHealing = new SelfHealingManager();
+
+Return ONLY the TypeScript code, no markdown formatting or backticks.
+`;
+
+    try {
+      const completion = await this.openai.chat.completions.create({
+        model: config.openaiModel,
+        messages: [
+          {
+            role: 'system',
+            content: 'You are a Playwright expert. Generate clean, production-ready test code with proper TypeScript syntax.',
+          },
+          {
+            role: 'user',
+            content: prompt,
+          },
+        ],
+        temperature: 0.2,
+        max_tokens: 1500,
+      });
+
+      let code = completion.choices[0].message.content || '';
+      
+      // Clean any markdown formatting
+      code = code
+        .replace(/```typescript\n?/g, '')
+        .replace(/```ts\n?/g, '')
+        .replace(/```\n?/g, '')
+        .trim();
+
+      return code;
+    } catch (error) {
+      console.error('Error converting test to Playwright code:', error);
+      throw error;
+    }
+  }*/
+
+  async convertTestToPlaywrightCode(testCase: TestCase): Promise<string> {
+  const prompt = `
+Convert the following test case into executable Playwright TypeScript code that MUST use the SelfHealingManager for ALL element interactions.
+
+Test Case:
+${JSON.stringify(testCase, null, 2)}
+
+CRITICAL REQUIREMENTS:
+
+1. ALWAYS import and use SelfHealingManager:
+   import { test, expect } from '@playwright/test';
+   import { SelfHealingManager } from '../../src/core/selfHealing';
+
+2. Initialize self-healing in beforeEach:
+   let selfHealing: SelfHealingManager;
+   test.beforeEach(async ({ page }) => {
+     selfHealing = new SelfHealingManager('./data/selectors');
+     await page.goto('https://demo.playwright.dev/todomvc');
+     
+     // Clear localStorage for clean test state
+     await page.evaluate(() => localStorage.clear());
+     await page.reload();
+     
+     await page.waitForLoadState('networkidle');
+   });
+
+3. FOR EVERY ELEMENT INTERACTION, use this pattern:
+   const { locator } = await selfHealing.findElementWithHealing(
+     page,
+     'css-selector',
+     'human-readable description of the element'
+   );
+   await locator.click(); // or .fill(), .check(), etc.
+
+4. Common TodoMVC selectors (use these as the first parameter):
+   - Input field: '.new-todo' or '[placeholder="What needs to be done?"]'
+   - Todo item: '.todo-list li'
+   - Checkbox: '.toggle'
+   - Delete button: '.destroy'
+   - Edit input: '.edit'
+   - Filter links: use page.getByRole('link', { name: 'Active' }) directly (no healing needed)
+   - Toggle all: '.toggle-all'
+   - Clear completed: '.clear-completed'
+   - Todo count: '.todo-count'
+
+5. EXAMPLE of correct code:
+   // ✅ CORRECT - uses self-healing
+   const { locator: input } = await selfHealing.findElementWithHealing(
+     page, '.new-todo', 'Main todo input field'
+   );
+   await input.fill('Buy groceries');
+   await input.press('Enter');
+
+   // ✅ CORRECT - uses self-healing for checkbox
+   const { locator: checkbox } = await selfHealing.findElementWithHealing(
+     page, '.toggle', 'Checkbox to complete todo'
+   );
+   await checkbox.first().click();
+
+   // ❌ WRONG - never do this
+   await page.fill('.new-todo', 'Buy groceries');
+   await page.check('.toggle');
+
+6. For assertions with locators that may match multiple elements, always use .first():
+   // ✅ CORRECT
+   await expect(page.locator('.todo-list li').first()).toHaveText('Buy groceries');
+   await expect(page.locator('text=Buy groceries').first()).toBeVisible();
+   
+   // For counting, don't use .first()
+   await expect(page.locator('.todo-list li')).toHaveCount(3);
+
+7. Return ONLY valid TypeScript code with no markdown, no backticks, no explanations.
+
+Generate the complete test file now:
+`;
+
+  try {
+    const completion = await this.openai.chat.completions.create({
+      model: config.openaiModel,
+      messages: [
+        {
+          role: 'system',
+          content: 'You are a Playwright expert who ALWAYS uses SelfHealingManager for element interactions. Generate clean, working test code that follows the exact patterns specified.',
+        },
+        {
+          role: 'user',
+          content: prompt,
+        },
+      ],
+      temperature: 0.2,
+      max_tokens: 2000,
+    });
+
+    let code = completion.choices[0].message.content || '';
+    
+    // Clean any markdown formatting
+    code = code
+      .replace(/```typescript\n?/g, '')
+      .replace(/```ts\n?/g, '')
+      .replace(/```\n?/g, '')
+      .trim();
+
+    return code;
+  } catch (error) {
+    console.error('Error converting test to Playwright code:', error);
+    throw error;
+  }
+}
+
+  async suggestBetterSelector(
+    currentSelector: string,
+    elementHtml: string,
+    context: string
+  ): Promise<string> {
+    const prompt = `
+Analyze this element and suggest a more robust Playwright selector.
+
+Current Selector: ${currentSelector}
+Element HTML: ${elementHtml}
+Context: ${context}
+
+Suggest the best selector following Playwright best practices:
+1. Prefer user-facing attributes (role, label, text)
+2. Use data-testid for stable elements
+3. Avoid fragile CSS selectors with generated classes
+4. Ensure uniqueness
+
+Return ONLY the selector string, nothing else.
+`;
+
+    try {
+      const completion = await this.openai.chat.completions.create({
+        model: config.openaiModel,
+        messages: [
+          {
+            role: 'system',
+            content: 'You are a Playwright selector optimization expert.',
+          },
+          {
+            role: 'user',
+            content: prompt,
+          },
+        ],
+        temperature: 0.1,
+        max_tokens: 100,
+      });
+
+      return completion.choices[0].message.content?.trim() || currentSelector;
+    } catch (error) {
+      console.error('Error suggesting better selector:', error);
       return currentSelector;
     }
   }
