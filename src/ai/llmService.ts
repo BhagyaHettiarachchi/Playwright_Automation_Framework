@@ -463,22 +463,27 @@ Return ONLY the TypeScript code, no markdown formatting or backticks.
   }*/
 
   async convertTestToPlaywrightCode(testCase: TestCase): Promise<string> {
-  const prompt = `
-Convert the following test case into executable Playwright TypeScript code that MUST use the SelfHealingManager for ALL element interactions.
+const prompt = `
+Convert the following test case into executable Playwright TypeScript code that MUST use the SelfHealingManager for ALL element interactions AND VisualRegressionManager for screenshot comparison.
 
 Test Case:
 ${JSON.stringify(testCase, null, 2)}
 
 CRITICAL REQUIREMENTS:
 
-1. ALWAYS import and use SelfHealingManager:
+1. ALWAYS import and use SelfHealingManager AND VisualRegressionManager:
    import { test, expect } from '@playwright/test';
    import { SelfHealingManager } from '../../src/core/selfHealing';
+   import { VisualRegressionManager } from '../../src/core/visualRegression';
 
-2. Initialize self-healing in beforeEach:
+2. Initialize self-healing AND visual regression in beforeEach:
    let selfHealing: SelfHealingManager;
+   let visual: VisualRegressionManager;
+   
    test.beforeEach(async ({ page }) => {
      selfHealing = new SelfHealingManager('./data/selectors');
+     visual = new VisualRegressionManager();
+     
      await page.goto('https://demo.playwright.dev/todomvc');
      
      // Clear localStorage for clean test state
@@ -526,14 +531,26 @@ CRITICAL REQUIREMENTS:
    await page.check('.toggle');
 
 6. For assertions with locators that may match multiple elements, always use .first():
-   // ✅ CORRECT
    await expect(page.locator('.todo-list li').first()).toHaveText('Buy groceries');
    await expect(page.locator('text=Buy groceries').first()).toBeVisible();
-   
-   // For counting, don't use .first()
+
+7. CRITICAL: When asserting count is 0, do NOT add text or visibility checks:
+   await expect(page.locator('.todo-list li')).toHaveCount(0);
+   // Rule: If count is 0, that's sufficient. No additional checks needed.
+
+8. For assertions, you can use page.locator() directly:
    await expect(page.locator('.todo-list li')).toHaveCount(3);
 
-7. Return ONLY valid TypeScript code with no markdown, no backticks, no explanations.
+9. ALWAYS capture visual regression screenshot at the END of each test:
+   // Add this as the LAST line in every test
+   await visual.captureAndCompare(page, 'descriptive-test-name', { fullPage: true });
+   
+   // Use descriptive names based on the test scenario
+   // Examples:
+   await visual.captureAndCompare(page, 'add-todo-complete', { fullPage: true });
+   await visual.captureAndCompare(page, 'delete-todo-empty-state', { fullPage: true });
+
+10. Return ONLY valid TypeScript code with no markdown, no backticks, no explanations.
 
 Generate the complete test file now:
 `;
