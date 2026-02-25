@@ -6,6 +6,7 @@
   "scripts": {
     "build": "tsc",
     "test": "playwright test",
+    "test:ci": "playwright test --reporter=html,json,junit",
     "test:headed": "playwright test --headed",
     "test:debug": "playwright test --debug",
     "quickstart": "ts-node examples/quickstart.ts",
@@ -13,6 +14,7 @@
     "simple-demo": "node examples/simple-demo.js",
     "generate:tests": "ts-node src/scripts/generateTests.ts",
     "generate:and:run": "ts-node src/scripts/generateTests.ts && playwright test",
+    "setup:ci": "npm ci && npx playwright install --with-deps",
     "collect:metrics": "ts-node src/scripts/collectMetrics.ts",
     "report": "playwright show-report",
     "clean": "rm -rf dist reports screenshots/diff",
