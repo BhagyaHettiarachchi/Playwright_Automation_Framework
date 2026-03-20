@@ -1,0 +1,10 @@
+As a user
+I want to add multiple todo items
+So that I can manage all my tasks in one place
+
+Scenario: Add multiple todo items
+Given I am on the TodoMVC page
+And I type "Walk the dog" and press Enter
+And I type "Read a book" and press Enter
+Then I should see all 2 items in the todo list
+And the todo count should show "2 items left"

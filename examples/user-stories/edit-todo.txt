@@ -1,0 +1,17 @@
+As a user
+I want to edit an existing todo item
+So that I can correct mistakes or update tasks
+
+Scenario: Edit a todo item
+Given I am on the TodoMVC page
+And I have added "Read a book" to the list
+When I edit the todo:
+  1. Find the first todo item
+  2. Find the label element within that todo item
+  3. Double-click on the label to activate edit mode
+  4. Wait for the edit input to be visible
+  5. Fill the edit input with "Read the books"
+  6. Press Enter to save
+  7. Wait for editing mode to close
+
+Then the first todo item should display "Read the books"

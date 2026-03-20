@@ -24,6 +24,9 @@ export default defineConfig({
     video: 'on',
     headless: process.env.HEADLESS !== 'false',
     actionTimeout: parseInt(process.env.TIMEOUT || '30000'),
+    launchOptions: {
+      slowMo: 300,
+    },
   },
 
   projects: [

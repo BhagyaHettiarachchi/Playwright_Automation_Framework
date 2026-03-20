@@ -340,21 +340,37 @@ export class SelfHealingManager {
         return { locator, healed: false };
       }
 
-      if (count === 0) {
+      /*if (count === 0) {
         console.log(`Element not found with selector: ${originalSelector}`);
         console.log('Attempting self-healing...');
         return await this.healSelector(page, originalSelector, elementContext);
-      }
+      }*/
+     if (count === 0) {
+  console.log(`\n⚠️  Original selector '${originalSelector}' failed`);
+  console.log(`🔧 Attempting self-healing...`);
+  if (elementContext) {
+    console.log(`   Context: ${elementContext}\n`);
+  }
+  return await this.healSelector(page, originalSelector, elementContext);
+}
 
       if (count > 1) {
         console.log(`Multiple elements found (${count}). Refining selector...`);
         return await this.refineSelector(page, originalSelector, elementContext);
       }
-    } catch (error) {
+    /*} catch (error) {
       console.log(`Element not found with selector: ${originalSelector}`);
       console.log('Attempting self-healing...');
       return await this.healSelector(page, originalSelector, elementContext);
-    }
+    }*/
+   } catch (error) {
+  console.log(`\n⚠️  Original selector '${originalSelector}' failed`);
+  console.log(`🔧 Attempting self-healing...`);
+  if (elementContext) {
+    console.log(`   Context: ${elementContext}\n`);
+  }
+  return await this.healSelector(page, originalSelector, elementContext);
+}
 
     throw new Error(`Failed to locate element: ${originalSelector}`);
   }
@@ -366,7 +382,7 @@ export class SelfHealingManager {
   ): Promise<{ locator: Locator; healed: boolean; newSelector: string }> {
     
     // ✅ All strategies in order
-    const strategies = [
+    /*const strategies = [
       () => this.tryPlaceholderSelector(page, originalSelector, elementContext),
       () => this.tryContextBasedSelector(page, elementContext),
       () => this.tryRoleBasedSelector(page, originalSelector, elementContext),
@@ -394,6 +410,43 @@ export class SelfHealingManager {
     }
 
     throw new Error(`Self-healing failed for selector: ${originalSelector}`);
+  }*/
+ // ✅ All strategies in order with names for logging
+const strategies = [
+  { name: 'placeholder-based', fn: () => this.tryPlaceholderSelector(page, originalSelector, elementContext) },
+  { name: 'context-based', fn: () => this.tryContextBasedSelector(page, elementContext) },
+  { name: 'role-based', fn: () => this.tryRoleBasedSelector(page, originalSelector, elementContext) },
+  { name: 'text-based', fn: () => this.tryTextBasedSelector(page, originalSelector) },
+  { name: 'attribute-based', fn: () => this.tryAttributeBasedSelector(page, originalSelector) },
+  { name: 'input-type', fn: () => this.tryInputTypeSelector(page, elementContext) },
+  { name: 'xpath-alternatives', fn: () => this.tryXPathAlternatives(page, originalSelector) },
+  { name: 'AI-powered', fn: () => this.tryAISelector(page, originalSelector, elementContext) },
+];
+
+for (const strategy of strategies) {
+  console.log(`🔧 Trying healing strategy: ${strategy.name}`);
+  
+  try {
+    const result = await strategy.fn();
+    if (result) {
+      console.log(`✅ Healed using: ${result.selector}\n`);
+      await this.logHealing(originalSelector, result.selector, result.reason);
+      return {
+        locator: page.locator(result.selector),
+        healed: true,
+        newSelector: result.selector,
+      };
+    } else {
+      console.log(`   ❌ ${strategy.name} - no match found`);
+    }
+  } catch (error) {
+    console.log(`   ❌ ${strategy.name} - failed`);
+    continue;
+  }
+}
+
+console.log(`❌ All healing strategies exhausted. Element not found.\n`);
+throw new Error(`Self-healing failed for selector: ${originalSelector}`);
   }
 
   // ─────────────────────────────────────────────────────────
@@ -807,6 +860,7 @@ export class SelfHealingManager {
 
     console.log(`✓ Self-healing applied: ${originalSelector} → ${newSelector}`);
     console.log(`  Reason: ${reason}`);
+    
   }
 
   async getHealingStats(): Promise<any> {

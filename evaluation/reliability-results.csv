@@ -1,0 +1,61 @@
+﻿Test_Group    , Run_Number, Tests_Passed, Tests_Failed, Total_Time_Seconds
+Manual        ,          1,            5,            0,  7.700291000000001
+Manual        ,          2,            5,            0,  6.7662789999999995
+Manual        ,          3,            5,            0,  7.250573
+Manual        ,          4,            5,            0, 11.07956
+Manual        ,          5,            0,            5, 45.084694
+Manual        ,          6,            5,            0,  8.450902
+Manual        ,          7,            5,            0,  6.75958
+Manual        ,          8,            5,            0,  6.6276669999999995
+Manual        ,          9,            5,            0,  6.615688
+Manual        ,         10,            5,            0,  7.206803
+Manual        ,         11,            5,            0,  6.678693
+Manual        ,         12,            5,            0,  6.939696
+Manual        ,         13,            5,            0,  7.074157999999999
+Manual        ,         14,            5,            0,  7.152021000000001
+Manual        ,         15,            5,            0,  6.829351000000001
+Manual        ,         16,            5,            0,  7.548955
+Manual        ,         17,            5,            0,  6.82983
+Manual        ,         18,            5,            0,  7.450187
+Manual        ,         19,            5,            0,  5.953255
+Manual        ,         20,            5,            0,  5.955081
+AI-Generated  ,          1,            4,            1, 10.175167
+AI-Generated  ,          2,            4,            1, 10.296133
+AI-Generated  ,          3,            4,            1, 10.769222000000002
+AI-Generated  ,          4,            4,            1, 11.447021
+AI-Generated  ,          5,            4,            1, 11.071583999999999
+AI-Generated  ,          6,            4,            1, 10.816613000000001
+AI-Generated  ,          7,            4,            1, 10.840096
+AI-Generated  ,          8,            4,            1, 11.12123
+AI-Generated  ,          9,            4,            1, 10.66462
+AI-Generated  ,         10,            4,            1, 10.896960000000001
+AI-Generated  ,         11,            4,            1, 10.971222
+AI-Generated  ,         12,            4,            1, 10.92221
+AI-Generated  ,         13,            4,            1, 10.678914
+AI-Generated  ,         14,            4,            1, 11.132925
+AI-Generated  ,         15,            4,            1, 11.055382000000001
+AI-Generated  ,         16,            4,            1, 10.732607
+AI-Generated  ,         17,            4,            1, 10.901427
+AI-Generated  ,         18,            4,            1, 10.858511
+AI-Generated  ,         19,            4,            1, 10.825474
+AI-Generated  ,         20,            4,            1, 10.897613000000001
+AI-SelfHealing,          1,            4,            1, 10.632213
+AI-SelfHealing,          2,            4,            1, 10.872482
+AI-SelfHealing,          3,            4,            1, 10.855909
+AI-SelfHealing,          4,            4,            1, 11.205968
+AI-SelfHealing,          5,            4,            1, 10.808073
+AI-SelfHealing,          6,            4,            1, 10.932061000000002
+AI-SelfHealing,          7,            4,            1, 10.894278999999999
+AI-SelfHealing,          8,            4,            1, 11.047298999999999
+AI-SelfHealing,          9,            4,            1, 11.019636
+AI-SelfHealing,         10,            4,            1, 10.674733
+AI-SelfHealing,         11,            4,            1, 11.258889000000001
+AI-SelfHealing,         12,            4,            1, 11.160704
+AI-SelfHealing,         13,            4,            1, 10.783435
+AI-SelfHealing,         14,            4,            1, 11.291548
+AI-SelfHealing,         15,            4,            1, 11.093891
+AI-SelfHealing,         16,            4,            1, 10.673175
+AI-SelfHealing,         17,            4,            1, 10.772883
+AI-SelfHealing,         18,            4,            1, 11.040153999999999
+AI-SelfHealing,         19,            4,            1, 10.660231
+AI-SelfHealing,         20,            4,            1, 10.881398000000001

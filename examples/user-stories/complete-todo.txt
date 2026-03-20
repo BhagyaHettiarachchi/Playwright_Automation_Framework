@@ -1,0 +1,11 @@
+As a user
+I want to mark a todo item as complete
+So that I can track what I have finished
+
+Scenario: Mark a single todo as complete
+Given I am on the TodoMVC page
+And I have added "Buy groceries" to the list
+When I click the checkbox next to "Buy groceries"
+Then "Buy groceries" should appear with a strikethrough
+And the item should be styled as completed
+And the count should show "0 items left"

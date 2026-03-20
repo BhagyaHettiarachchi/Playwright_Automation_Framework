@@ -1,0 +1,3 @@
+Test_Name      , Error_Type        , Lines_Changed, Time_to_Fix_Min, Original_Code                                                                  , Fixed_Code                                            , Fix_Description
+3-complete-todo, css_assertion     ,             1,             2.5, "await expect(completedTodo).toHaveCSS('text-decoration-line', 'line-through')", "await expect(completedTodo).toHaveClass(/completed/)", Changed from CSS property check to class check
+4-edit-todo    , element_visibility,             8,             5.0, "Self-healing with .edit selector"                                             , "Direct locator with waitFor visible"                 , "Added proper visibility wait and removed unreliable self-healing"
